@@ -26,17 +26,17 @@
                 /* 直接将get 改成 post 即变为 post 请求 */
                 $.get(url, args, function(data){
                     var extend = data.extend;
-                    var comment_fenci = extend.comment_fenci;
+                    var comment_seg = extend.comment_seg;
                     var class_ = extend.class;
-                    // alert(comment_fenci[0].word);
+                    // alert(comment_seg[0].word);
                     
                     $("#fencihou").empty(); //先将所在区域清空以便插入新的数据
-                    // alert(comment_fenci.length);
-                    for(i=0,len = comment_fenci.length; i<len; i++){
+                    // alert(comment_seg.length);
+                    for(i=0,len = comment_seg.length; i<len; i++){
                         $("#fencihou").append("<button type='button' class='btn btn-primary'>" 
-                            + comment_fenci[i].word 
+                            + comment_seg[i].word 
                             + " / " 
-                            + comment_fenci[i].nature 
+                            + comment_seg[i].nature 
                             + "</button>&nbsp&nbsp&nbsp");
                         if(i > 0 && (i+1) % 10 == 0) {
                             $("#fencihou").append("<hr>");
@@ -126,7 +126,6 @@
                   <li><a href="#tab-chrome">简介</a></li>
                   <li><a href="#tab-firefox">贝叶斯分类器</a></li>
                   <li><a href="#tab-safari">分词演示</a></li>
-                  <li><a href="#tab-opera">分词正确率测试</a></li>
                 </ul>
               </li>
               <li><a href="#" data-toggle="modal" data-target="#about">About</a></li>
