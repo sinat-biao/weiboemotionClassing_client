@@ -44,8 +44,10 @@
                     }
                     if(class_ == 0){
                         $("#leibie").empty().append("<button type='button' class='btn btn-success'>正面类</button>");
-                    } else {
+                    } else if(class_ == 1) {
                         $("#leibie").empty().append("<button type='button' class='btn btn-warning'>负面类</button>")
+                    } else {
+                        $("#leibie").empty().append("<button type='button' class='btn btn-danger'>语料信息不足，无法正确分类！</button>")
                     }
                 });
                 return false;
