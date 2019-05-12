@@ -10,6 +10,9 @@
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- 引入 echarts.js -->
+    <script src="js/echarts.min.js"></script>
+
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
@@ -52,6 +55,129 @@
                 });
                 return false;
             });
+
+            //调用测试集数据
+            $("#submit-modeltest").click(function(){
+                // alert('asdfsafs');
+                var url = 'http://127.0.0.1:8080/emotionClassing/testdataset';
+                var args = {"time" : new Date()};
+
+                var accuracy;
+                var pp_precision;
+                var pn_precision;
+                var rp_recall;
+                var rn_recall;
+                var Fp_measure;
+                var Fn_measure;
+
+                $.get(url, args, function(data){
+                    var extend = data.extend;
+                    var indexs = extend.indexs;
+                    accuracy = indexs.accuracy.toFixed(6);
+                    pp_precision = indexs.pp_precision.toFixed(6);
+                    pn_precision = indexs.pn_precision.toFixed(6);
+                    rp_recall = indexs.rp_recall.toFixed(6);
+                    rn_recall = indexs.rn_recall.toFixed(6);
+                    Fp_measure = indexs.Fp_measure.toFixed(6);
+                    Fn_measure = indexs.Fn_measure.toFixed(6);
+                    alert("测试预料评测完成！");
+                    var myChart = echarts.init(document.getElementById('main'));
+                    var option = {
+                            title: {
+                                text: '测试集评测结果',
+                                subtext: '二分类'
+                            },
+                            tooltip: {
+                                trigger: 'axis',
+                                axisPointer: {
+                                    type: 'shadow'
+                                }
+                            },
+                            legend: {
+                                data: ['正面类', '', '负面类']
+                            },
+                            grid: {
+                                left: '3%',
+                                right: '4%',
+                                bottom: '3%',
+                                containLabel: true
+                            },
+                            xAxis: {
+                                type: 'value',
+                                boundaryGap: [0, 0.01]
+                            },
+                            yAxis: {
+                                type: 'category',
+                                data: ['accuracy\n(正确率) ', '', 'precision\n(精确率) ', '', 'recall\t\t\n(召回率)', '', 'F-measure'],
+                                
+                            },
+                            series: [
+                                
+                                {
+                                    name: '正面类',
+                                    type: 'bar',
+                                    data: [, , pp_precision, , rp_recall, , Fp_measure],
+                                    itemStyle: {
+                                        normal: {
+                                            label: {
+                                                show: true, //开启显示
+                                                position: 'right', //在上方显示
+                                                textStyle: { //数值样式
+                                                    color: 'black',
+                                                    fontSize: 16
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    name:'',
+                                    type: 'bar',
+                                    data: [accuracy],
+                                    itemStyle: {
+                                        normal: {
+                                            label: {
+                                                show: true, //开启显示
+                                                position: 'right', //在上方显示
+                                                textStyle: { //数值样式
+                                                    color: 'black',
+                                                    fontSize: 16
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    name: '负面类',
+                                    type: 'bar',
+                                    data: [, , pn_precision, , rn_recall, , Fn_measure],
+                                    itemStyle: {
+                                        normal: {
+                                            label: {
+                                                show: true, //开启显示
+                                                position: 'right', //在上方显示
+                                                textStyle: { //数值样式
+                                                    color: 'black',
+                                                    fontSize: 16
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                            ]
+                        };
+
+                    // 使用刚指定的配置项和数据显示图表。
+                    myChart.setOption(option);
+                });
+
+                
+                // var url = '';
+                // $("#echart-modeltest").empty().append();
+                return false;
+            });
+
         });
     </script>
     <style>
@@ -126,7 +252,7 @@
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Category <span class="caret"></span></a>
                 <ul class="dropdown-menu">
                   <li><a href="#tab-chrome">简介</a></li>
-                  <li><a href="#tab-firefox">贝叶斯分类器</a></li>
+                  <li><a href="#tab-firefox">模型评测</a></li>
                   <li><a href="#tab-safari">分词演示</a></li>
                 </ul>
               </li>
@@ -195,7 +321,7 @@
         <!-- 标签页 -->
         <ul class="nav nav-tabs" role="tablist" id="tab-list">
             <li role="presentation" class="active"><a href="#tab-chrome" aria-controls="home" role="tab" data-toggle="tab">简介</a></li>
-            <li role="presentation"><a href="#tab-firefox" role="tab" data-toggle="tab">贝叶斯分类器</a></li>
+            <li role="presentation"><a href="#tab-firefox" role="tab" data-toggle="tab">模型评测</a></li>
             <li role="presentation"><a href="#tab-safari" role="tab" data-toggle="tab">分词演示</a></li>
         </ul>
         <!-- Tab panes -->
@@ -213,15 +339,32 @@
             </div>
             <div role="tabpanel" class="tab-pane" id="tab-firefox">
                 <div class="row feature">
-                    <div class="col-md-5">
-                        <img class="feature-image img-responsive" src="images/贝叶斯.jpg" alt="Firefox">
+                    <div class="col-md-12">
+                        <h2 class="feature-heading"> 模型评测 <span class="text-muted">测试集评测</span></h2>
+                        <p class="lead">利用测试数据集对模型进行相关指标评测，从而反映模型的优劣！</p>
+                        <hr class="divider"/>
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                    <button type="submit" id="submit-modeltest" class="btn btn-success">Run</button>
+                                </div>
+                            </div>
+                            <hr class="divider"/>
+                            <div class="form-group">
+                                <div class="col-md-12 col-md-offset-1" id="echart-modeltest">
+                                    <div id="main" style="width: 900px;height:600px;">
+                                        <!-- 在此插入图表 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                    <div class="col-md-7">
+                    <!-- <div class="col-md-7">
                         <h2 class="feature-heading"> 贝叶斯分类器 <span class="text-muted">错误概率最小的分类器</span></h2>
                         <p class="lead">贝叶斯分类算法是统计学的一种分类方法，它是一类利用概率统计知识进行分类的算法。
                             在许多场合，朴素贝叶斯(Naive Bayes，NB)分类算法可以与决策树和神经网络分类算法相媲美，
                             该算法能运用到大型数据库中，而且方法简单、分类准确率高、速度快。</p>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <div role="tabpanel" class="tab-pane" id="tab-safari">
